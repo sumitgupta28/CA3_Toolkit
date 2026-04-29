@@ -56,10 +56,10 @@ QUESTION_BLOOMS_LEVELS = {
 }
 
 QUESTION_AR_REFERENCES = {
-    "1a": "Unit 1, Ch.1", "1b": "Unit 1, Ch.1", "1c": "Unit 1, Ch.2",
-    "1d": "Unit 1, Ch.2", "1e": "Unit 2, Ch.1",
-    "2":  "Unit 2, Ch.2", "3":  "Unit 3, Ch.1", "4":  "Unit 3, Ch.2",
-    "5":  "Unit 4, Ch.1", "6":  "Unit 4, Ch.2", "7":  "Unit 5, Ch.1",
+    "1a": "1AB", "1b": "1BC", "1c": "1CD",
+    "1d": "1DE", "1e": "2EF",
+    "2":  "2FG", "3":  "3GH", "4":  "3HI",
+    "5":  "4IJ", "6":  "4JK", "7":  "5KL",
 }
 
 # Per-student per-question (random)
@@ -72,31 +72,32 @@ REMARKS_POOL = [
 ]
 
 STRENGTHS_POOL = [
-    "Good understanding of core concepts with clear and structured answers.",
-    "Excellent problem-solving approach; solutions are well-reasoned and concise.",
-    "Strong command of theoretical concepts with accurate examples.",
-    "Demonstrates solid grasp of the subject; answers are precise and well-organised.",
-    "Very good analytical thinking with all steps clearly explained.",
+    "Good understanding.",
+    "Excellent problem-solving approach",
+    "Strong command ",
+    "Demonstrates solid .",
+    "Very good analytical thinking .",
 ]
 
 AREAS_POOL = [
-    "Needs to improve time management; some answers were incomplete.",
-    "Should focus on revising edge cases and boundary conditions.",
-    "More practice on complex data structure problems is recommended.",
-    "Deeper understanding of algorithmic complexity (Big-O) is needed.",
-    "Handwriting and presentation could be improved for clarity.",
+    "Needs to improve time management.",
+    "Should focus on revising edge cases.",
+    "More practice needed.",
+    "Deeper understanding needed.",
+    "Handwriting could be improved for clarity.",
 ]
 
 CORRECTIVE_POOL = [
-    "Revise chapters 4 and 5 and attempt additional practice problems.",
-    "Refer to recommended textbook exercises on sorting and searching.",
-    "Attend extra tutorial sessions for algorithm analysis.",
-    "Practice writing pseudocode and trace tables for complex problems.",
-    "Review lecture notes on trees and graphs; attempt past papers.",
+    "Attempt additional practice problems.",
+    "Refer to recommended textbook .",
+    "Attend extra tutorial sessions .",
+    "Practice writing pseudocode .",
+    "Review lecture notes on.",
 ]
 
 # ── styles ────────────────────────────────────────────────────────────────────
 _YELLOW = PatternFill("solid", fgColor="FFFACD")
+_TEAL   = PatternFill("solid", fgColor="E0F4F4")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -155,26 +156,26 @@ def main():
     print("-" * 60)
 
     for row_num in range(2, ws.max_row + 1):
+        # ── allotted marks (random 2–10 per question) ────────────────────
+        allotted_map = {}
+        for q in QUESTION_LABELS:
+            allotted = random.randint(2, 10)
+            allotted_map[q] = allotted
+            c = ws.cell(row=row_num, column=col[allotted_hdr(q)], value=allotted)
+            c.fill      = _TEAL
+            c.alignment = Alignment(horizontal="center", vertical="center")
+
         # ── awarded marks ─────────────────────────────────────────────────
         for q in QUESTION_LABELS:
-            allotted_val = ws.cell(row=row_num, column=col[allotted_hdr(q)]).value
-            try:
-                allotted = int(str(allotted_val).strip())
-            except (ValueError, TypeError):
-                allotted = 0
-
-            if allotted > 0:
-                raw = random.uniform(MIN_FRACTION, 1.0) * allotted
-                awarded = int(raw) if raw == int(raw) else round(raw, 1)
-            else:
-                awarded = 0
+            allotted = allotted_map[q]
+            raw = random.uniform(MIN_FRACTION, 1.0) * allotted
+            awarded = int(raw) if raw == int(raw) else round(raw, 1)
 
             cell = ws.cell(row=row_num, column=col[awarded_hdr(q)], value=awarded)
             cell.fill      = _YELLOW
             cell.alignment = Alignment(horizontal="center", vertical="center")
 
         # ── course outcome & bloom's level (fixed per question) ───────────
-        _TEAL = PatternFill("solid", fgColor="E0F4F4")
         for q in QUESTION_LABELS:
             c = ws.cell(row=row_num, column=col[course_outcome_hdr(q)],
                         value=QUESTION_COURSE_OUTCOMES[q])

@@ -28,6 +28,7 @@ from datetime import date
 try:
     from docx import Document
     from docx.shared import Inches, Pt
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
     from docx.oxml.ns import qn
     from docx.oxml import OxmlElement
     import lxml.etree as etree
@@ -160,6 +161,7 @@ def update_document(src_path, dest_path, row_data, signature_path):
             try:
                 cells = marks_table.rows[row_i].cells
                 col_map = [
+                    (1, f"Allotted {label.upper()}"),
                     (2, f"Awarded {label.upper()}"),
                     (3, f"Course Outcome {label.upper()}"),
                     (4, f"Blooms Level {label.upper()}"),
@@ -205,20 +207,25 @@ def update_document(src_path, dest_path, row_data, signature_path):
                 break
 
     # ── Examiner signature & date ─────────────────────────────────────────
-    # Find the paragraph containing "Signature of the Examiner with date"
+    # Insert a new paragraph with signature image + date ABOVE the label,
+    # leaving "Signature of the Examiner with date" paragraph untouched.
     for idx, pt in enumerate(para_texts):
         if "Signature of the Examiner" in pt:
             sig_para = doc.paragraphs[idx]
-            # Clear the paragraph and replace with signature image + date text
-            for run in sig_para.runs:
-                run._r.getparent().remove(run._r)
 
+            # Use doc.add_paragraph so image relationships are handled correctly,
+            # then move the resulting XML element to just before the label.
+            new_para = doc.add_paragraph()
+            new_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             if signature_path and Path(signature_path).exists():
-                run_img = sig_para.add_run()
+                run_img = new_para.add_run()
                 run_img.add_picture(signature_path, width=Inches(SIGNATURE_WIDTH_INCHES))
-
-            run_date = sig_para.add_run(f"  {TODAY_STR}")
+            run_date = new_para.add_run(f"\n{TODAY_STR}")
             run_date.font.size = Pt(9)
+
+            new_p = new_para._p
+            new_p.getparent().remove(new_p)
+            sig_para._p.addprevious(new_p)
             break
 
     doc.save(dest_path)
