@@ -19,7 +19,10 @@ pip install python-docx openpyxl docx2pdf
 # Step 1: Extract all student .docx files from students/ into CA3_Marks/marks.xlsx
 python extract_to_excel.py
 
-# Step 2: Manually open CA3_Marks/marks.xlsx and fill yellow-highlighted cells with marks/feedback
+# Step 2a: (optional) Auto-fill yellow cells with dummy marks/feedback for testing
+python fill_dummy_marks.py
+
+# Step 2b: Manually open CA3_Marks/marks.xlsx and fill yellow-highlighted cells with marks/feedback
 
 # Step 3: Merge marks back into documents and export PDFs to CA3_Marks_Pdf/
 python fill_marks_and_export.py

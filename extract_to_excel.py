@@ -102,15 +102,22 @@ def parse_student_doc(filepath):
             row_i = i + 1          # row 0 is the header
             try:
                 row = marks_table.rows[row_i]
-                data[f"marks_allotted_{label}"] = row.cells[1].text.strip()
-                data[f"marks_awarded_{label}"]  = row.cells[2].text.strip()
+                cells = row.cells
+                data[f"marks_allotted_{label}"]  = cells[1].text.strip() if len(cells) > 1 else ""
+                data[f"marks_awarded_{label}"]   = cells[2].text.strip() if len(cells) > 2 else ""
+                data[f"course_outcome_{label}"]  = cells[3].text.strip() if len(cells) > 3 else ""
+                data[f"blooms_level_{label}"]    = cells[4].text.strip() if len(cells) > 4 else ""
+                data[f"remarks_{label}"]         = cells[5].text.strip() if len(cells) > 5 else ""
+                data[f"ar_reference_{label}"]    = cells[6].text.strip() if len(cells) > 6 else ""
             except IndexError:
-                data[f"marks_allotted_{label}"] = ""
-                data[f"marks_awarded_{label}"]  = ""
+                for key in ["marks_allotted", "marks_awarded", "course_outcome",
+                            "blooms_level", "remarks", "ar_reference"]:
+                    data[f"{key}_{label}"] = ""
     else:
         for label in QUESTION_LABELS:
-            data[f"marks_allotted_{label}"] = ""
-            data[f"marks_awarded_{label}"]  = ""
+            for key in ["marks_allotted", "marks_awarded", "course_outcome",
+                        "blooms_level", "remarks", "ar_reference"]:
+                data[f"{key}_{label}"] = ""
 
     return data
 
@@ -127,11 +134,17 @@ def build_excel(rows, output_path):
         "date_of_examination", "subject_teacher", "mobile_number",
         "full_marks", "duration",
     ]
-    marks_allotted_cols = [f"marks_allotted_{q}" for q in QUESTION_LABELS]
-    marks_awarded_cols  = [f"marks_awarded_{q}"  for q in QUESTION_LABELS]
+    marks_allotted_cols  = [f"marks_allotted_{q}"  for q in QUESTION_LABELS]
+    course_outcome_cols  = [f"course_outcome_{q}"  for q in QUESTION_LABELS]
+    blooms_level_cols    = [f"blooms_level_{q}"    for q in QUESTION_LABELS]
+    marks_awarded_cols   = [f"marks_awarded_{q}"   for q in QUESTION_LABELS]
+    remarks_cols         = [f"remarks_{q}"         for q in QUESTION_LABELS]
+    ar_reference_cols    = [f"ar_reference_{q}"    for q in QUESTION_LABELS]
     feedback_cols = ["strengths", "areas_for_improvement", "corrective_measures"]
 
-    all_cols = info_cols + marks_allotted_cols + marks_awarded_cols + feedback_cols
+    all_cols = (info_cols + marks_allotted_cols + course_outcome_cols
+                + blooms_level_cols + marks_awarded_cols
+                + remarks_cols + ar_reference_cols + feedback_cols)
 
     # ── human-readable headers ────────────────────────────────────────────
     header_labels = {
@@ -150,8 +163,12 @@ def build_excel(rows, output_path):
         "duration": "Duration",
     }
     for q in QUESTION_LABELS:
-        header_labels[f"marks_allotted_{q}"] = f"Allotted {q.upper()}"
-        header_labels[f"marks_awarded_{q}"]  = f"Awarded {q.upper()}"
+        header_labels[f"marks_allotted_{q}"]  = f"Allotted {q.upper()}"
+        header_labels[f"course_outcome_{q}"]  = f"Course Outcome {q.upper()}"
+        header_labels[f"blooms_level_{q}"]    = f"Blooms Level {q.upper()}"
+        header_labels[f"marks_awarded_{q}"]   = f"Awarded {q.upper()}"
+        header_labels[f"remarks_{q}"]         = f"Remarks {q.upper()}"
+        header_labels[f"ar_reference_{q}"]    = f"AR Ref {q.upper()}"
     header_labels["strengths"]              = "Strengths"
     header_labels["areas_for_improvement"]  = "Areas for Improvement"
     header_labels["corrective_measures"]    = "Corrective Measures"
@@ -162,15 +179,22 @@ def build_excel(rows, output_path):
 
     header_fill_info     = PatternFill("solid", fgColor="1F3864")   # dark blue
     header_fill_allotted = PatternFill("solid", fgColor="375623")   # dark green
+    header_fill_outcome  = PatternFill("solid", fgColor="1F6B6B")   # dark teal  (Course Outcome)
+    header_fill_blooms   = PatternFill("solid", fgColor="17537A")   # dark cyan  (Bloom's Level)
     header_fill_awarded  = PatternFill("solid", fgColor="833C00")   # dark orange
+    header_fill_remarks  = PatternFill("solid", fgColor="6B1F1F")   # dark maroon (Remarks / AR Ref)
     header_fill_feedback = PatternFill("solid", fgColor="4B0082")   # dark purple
 
     row_fill_even = PatternFill("solid", fgColor="F2F2F2")
 
     def header_fill_for(col):
-        if col in info_cols:          return header_fill_info
+        if col in info_cols:           return header_fill_info
         if col in marks_allotted_cols: return header_fill_allotted
+        if col in course_outcome_cols: return header_fill_outcome
+        if col in blooms_level_cols:   return header_fill_blooms
         if col in marks_awarded_cols:  return header_fill_awarded
+        if col in remarks_cols:        return header_fill_remarks
+        if col in ar_reference_cols:   return header_fill_remarks
         return header_fill_feedback
 
     # ── write header row ──────────────────────────────────────────────────
@@ -192,9 +216,11 @@ def build_excel(rows, output_path):
             cell.border    = border
             if fill:
                 cell.fill = fill
-            # highlight the "marks awarded" columns in pale yellow (to fill in)
-            if col in marks_awarded_cols or col in feedback_cols:
+            # yellow = examiner fills; light teal = pre-filled from template
+            if col in marks_awarded_cols or col in remarks_cols or col in ar_reference_cols or col in feedback_cols:
                 cell.fill = PatternFill("solid", fgColor="FFFACD")
+            elif col in course_outcome_cols or col in blooms_level_cols:
+                cell.fill = PatternFill("solid", fgColor="E0F4F4")
 
     # ── column widths ─────────────────────────────────────────────────────
     col_widths = {
@@ -205,6 +231,11 @@ def build_excel(rows, output_path):
         "full_marks": 12, "duration": 12,
         "strengths": 30, "areas_for_improvement": 30, "corrective_measures": 30,
     }
+    for q in QUESTION_LABELS:
+        col_widths[f"course_outcome_{q}"] = 14
+        col_widths[f"blooms_level_{q}"]   = 14
+        col_widths[f"remarks_{q}"]        = 18
+        col_widths[f"ar_reference_{q}"]   = 14
     for col in all_cols:
         col_letter = openpyxl.utils.get_column_letter(all_cols.index(col) + 1)
         ws.column_dimensions[col_letter].width = col_widths.get(col, 13)

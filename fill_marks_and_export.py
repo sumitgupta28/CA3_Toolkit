@@ -157,11 +157,19 @@ def update_document(src_path, dest_path, row_data, signature_path):
         for i, label in enumerate(QUESTION_LABELS):
             row_i = i + 1   # row 0 is header
             try:
-                cell = marks_table.rows[row_i].cells[2]   # "Marks Awarded" column
-                excel_col = f"Awarded {label.upper()}"
-                val = row_data.get(excel_col, "").strip()
-                if val:
-                    set_cell_value(cell, val)
+                cells = marks_table.rows[row_i].cells
+                col_map = [
+                    (2, f"Awarded {label.upper()}"),
+                    (3, f"Course Outcome {label.upper()}"),
+                    (4, f"Blooms Level {label.upper()}"),
+                    (5, f"Remarks {label.upper()}"),
+                    (6, f"AR Ref {label.upper()}"),
+                ]
+                for col_idx, excel_key in col_map:
+                    if col_idx < len(cells):
+                        val = row_data.get(excel_key, "").strip()
+                        if val:
+                            set_cell_value(cells[col_idx], val)
             except IndexError:
                 pass
 

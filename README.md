@@ -87,6 +87,14 @@ Open `CA3_Marks/marks.xlsx` and fill in the **yellow columns**:
 
 Save and close the Excel file.
 
+> **Testing shortcut** — instead of filling the spreadsheet manually, run:
+> ```bash
+> python fill_dummy_marks.py
+> ```
+> This populates all yellow cells with randomly generated marks (60–100% of
+> each question's allotted marks) and sample feedback text so you can proceed
+> straight to Step 5.
+
 ### Step 5 — Update documents and export PDFs
 Place your signature image as `examiner_signature.png` in the project folder, then run:
 ```bash
