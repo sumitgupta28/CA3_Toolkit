@@ -1,5 +1,24 @@
 # CA3 Marks Processing — Setup & Usage Guide
 
+## Generating test documents (optional)
+
+Before running the full workflow, you can generate 10 sample student `.docx` files to test the pipeline end-to-end:
+
+```bash
+python generate_test_documents.py
+```
+
+This creates pre-filled student documents in the `students/` folder using a CA3 template (`Seal_Top_Sheet_template.docx`). Each document simulates a student who has completed the top information section and signed the bottom.
+
+Edit the constants at the top of `generate_test_documents.py` to customise:
+- `TEMPLATE_PATH` — path to your blank CA3 template
+- `COMMON_DATA` — shared fields (college, subject, teacher, etc.)
+- `STUDENTS` — individual student details (UPID, name, roll number, etc.)
+
+A `.zip` archive of all generated files (`students_test_documents.zip`) is also created by default.
+
+---
+
 ## What you need installed
 
 ```bash
