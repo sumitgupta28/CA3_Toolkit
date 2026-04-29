@@ -19,11 +19,33 @@ A `.zip` archive of all generated files (`students_test_documents.zip`) is also 
 
 ---
 
-## What you need installed
+## Initial setup
+
+Run the one-time setup script for your operating system. It will:
+- Verify Python 3 is installed
+- Create a `.venv` virtual environment
+- Upgrade `pip`
+- Install all dependencies from `requirements.txt`
+
+**macOS / Linux:**
+```bash
+chmod +x setup.sh   # only needed once
+./setup.sh
+```
+
+**Windows:**
+```bat
+setup.bat
+```
+
+After setup completes, activate the virtual environment before running any scripts:
 
 ```bash
-# Python packages
-pip install python-docx openpyxl docx2pdf
+# macOS / Linux
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
 ```
 
 > **PDF conversion** uses `docx2pdf` (requires Microsoft Word on macOS/Windows).
