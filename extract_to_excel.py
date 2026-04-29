@@ -95,9 +95,10 @@ def parse_student_doc(filepath):
         except IndexError:
             data[col_name] = ""
 
-    # ── Table 1: marks tabulation (header row + 11 data rows) ────────────
-    if len(tables) >= 2:
-        marks_table = tables[1]
+    # ── Table 2: marks tabulation (header row + 11 data rows) ────────────
+    # Table 0 = info, Table 1 = Assessment Rubrics (untouched), Table 2 = marks
+    if len(tables) >= 3:
+        marks_table = tables[2]
         for i, label in enumerate(QUESTION_LABELS):
             row_i = i + 1          # row 0 is the header
             try:

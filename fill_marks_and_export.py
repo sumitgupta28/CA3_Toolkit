@@ -151,9 +151,10 @@ def update_document(src_path, dest_path, row_data, signature_path):
     doc = Document(src_path)
     tables = doc.tables
 
-    # ── Marks Tabulation table (table[1]) ────────────────────────────────
-    if len(tables) >= 2:
-        marks_table = tables[1]
+    # ── Marks Tabulation table (table[2]) ────────────────────────────────
+    # Table 0 = info, Table 1 = Assessment Rubrics (untouched), Table 2 = marks
+    if len(tables) >= 3:
+        marks_table = tables[2]
         for i, label in enumerate(QUESTION_LABELS):
             row_i = i + 1   # row 0 is header
             try:
