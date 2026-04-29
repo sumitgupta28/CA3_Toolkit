@@ -1,0 +1,81 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+CA3 Marks Processing Toolkit — a Python automation system for processing Continuous Assessment exam submissions. It extracts student data from Word documents into Excel, allows examiners to fill in marks, then merges marks/feedback back into documents and exports PDFs.
+
+## Setup
+
+```bash
+pip install python-docx openpyxl docx2pdf
+# Optional: Install LibreOffice for PDF export (takes priority over docx2pdf if installed)
+```
+
+## Workflow (run in order)
+
+```bash
+# Step 1: Extract all student .docx files from students/ into CA3_Marks/marks.xlsx
+python extract_to_excel.py
+
+# Step 2: Manually open CA3_Marks/marks.xlsx and fill yellow-highlighted cells with marks/feedback
+
+# Step 3: Merge marks back into documents and export PDFs to CA3_Marks_Pdf/
+python fill_marks_and_export.py
+
+# Cleanup: Delete generated output, students/ contents; optionally delete CA3_Marks/marks.xlsx
+./cleanup.sh        # macOS/Linux
+cleanup.bat         # Windows
+python cleanup.py   # cross-platform (no prompt)
+
+# Dev only: Generate 10 test student documents into students/ folder
+python generate_test_documents.py
+```
+
+## Architecture
+
+Three pipeline scripts plus cleanup utilities. No shared module — configuration constants are defined at the top of each script.
+
+**`extract_to_excel.py`**
+- Reads `.docx` files from `students/`, parses two tables per document: a 6-row metadata table (college, program, student name, roll number, UPID, etc.) and an 11-question marks table
+- Writes `CA3_Marks/marks.xlsx` with color-coded headers and yellow editable cells for awarded marks and feedback
+
+**`fill_marks_and_export.py`**
+- Reads completed `CA3_Marks/marks.xlsx`, matches rows to original student documents via UPID
+- Updates documents with awarded marks, examiner feedback, signature image (`examiner_signature.png`), and timestamp
+- Saves updated `.docx` to `output/docx/` and converts to PDF in `CA3_Marks_Pdf/`
+- PDF conversion: tries LibreOffice headless first; falls back to `docx2pdf` (requires Microsoft Word); skips gracefully if neither is available
+
+**`generate_test_documents.py`**
+- Creates sample student documents from a CA3 template for testing the extraction pipeline
+
+**`cleanup.sh` / `cleanup.bat` / `cleanup.py`**
+- Deletes `output/`, `CA3_Marks_Pdf/`, `__pycache__/`, and contents of `students/`
+- `.sh` and `.bat` prompt the user before deleting `CA3_Marks/marks.xlsx`
+
+## Key Configuration Constants
+
+Each script defines these at the top — edit them to change paths:
+
+| Constant | Default | Script |
+|---|---|---|
+| `STUDENTS_FOLDER` | `"students"` | extract, fill |
+| `MARKS_EXCEL` | `"CA3_Marks/marks.xlsx"` | extract, fill |
+| `OUTPUT_DOCX_FOLDER` | `"output/docx"` | fill |
+| `OUTPUT_PDF_FOLDER` | `"CA3_Marks_Pdf"` | fill |
+| `SIGNATURE_IMAGE` | `"examiner_signature.png"` | fill |
+
+Question labels (used as Excel column headers and document placeholders): `["1a", "1b", "1c", "1d", "1e", "2", "3", "4", "5", "6", "7"]`
+
+## UPID Matching
+
+The UPID (unique student identifier) is the key that links student `.docx` files to rows in `marks.xlsx`. If a student document cannot be matched during the fill phase, verify that the UPID extracted in Phase 1 matches what is in the Excel file. UPIDs are parsed from the top metadata table in each document.
+
+## PDF Conversion
+
+`fill_marks_and_export.py` tries two converters in order:
+1. **LibreOffice** — auto-detected on macOS (`/Applications/LibreOffice.app`), Windows (`C:\Program Files\LibreOffice\program\soffice.exe`), and Linux (`libreoffice`)
+2. **docx2pdf** — Python package (`pip install docx2pdf`); requires Microsoft Word on macOS/Windows
+
+If neither is available, `.docx` output still proceeds — only PDF export is skipped.

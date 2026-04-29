@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Output folders
+output/
+CA3_Marks_Pdf/
+
+# Student documents (contain personal data)
+students/
+students_test_documents.zip
+
+# Marks spreadsheet (may contain personal data)
+CA3_Marks/marks.xlsx
+
+# Signature images
+examiner_signature.png
+teacher_signature/
+
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
