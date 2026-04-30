@@ -365,7 +365,12 @@ def main():
                     raw_roll = raw_roll.split(":", 1)[1].strip()
             roll = raw_roll.upper()
         except Exception as e:
-            print(f"    ⚠  Could not read Roll Number: {e}  — skipping.")
+            msg = str(e)
+            if "content type" in msg or "not a Word file" in msg:
+                print(f"    ⚠  Corrupt/invalid file — not a valid Word document.")
+                print(f"       Ask the student to re-export from Microsoft Word and resubmit.")
+            else:
+                print(f"    ⚠  Could not read Roll Number: {e}  — skipping.")
             skip_count += 1
             continue
 

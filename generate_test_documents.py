@@ -24,10 +24,10 @@ USAGE
 OUTPUT
 ------
     students/
-    ├── student_1083062235.docx   (Aarav Sharma)
-    ├── student_1083062236.docx   (Priya Mehta)
+    ├── Student_1083062235.docx   (Aarav Sharma)
+    ├── Student_1083062236.docx   (Priya Mehta)
     ├── ...
-    └── student_1083062244.docx   (Megha Singh)
+    └── Student_1083062244.docx   (Megha Singh)
 
 CONFIGURATION
 -------------
@@ -358,7 +358,7 @@ def main():
     errors    = []
 
     for student in STUDENTS:
-        fname = f"student_{student['roll']}.docx"
+        fname = f"Student_{student['roll']}.docx"
         fpath = out_dir / fname
         try:
             doc = build_student_document(template, student, COMMON_DATA)

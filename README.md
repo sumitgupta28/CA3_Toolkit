@@ -44,8 +44,8 @@ Set up your project folder like this before starting:
 your-project/
 │
 ├── students/                   ← Put all student .docx files here
-│   ├── student_1083062235.docx
-│   ├── student_1083062236.docx
+│   ├── Student_1083062235.docx
+│   ├── Student_1083062236.docx
 │   └── ...
 │
 ├── CA3_Marks/

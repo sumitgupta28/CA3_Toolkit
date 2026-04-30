@@ -76,7 +76,13 @@ def parse_student_doc(filepath):
     try:
         doc = Document(filepath)
     except Exception as e:
-        print(f"  ⚠  Could not open {filepath}: {e}")
+        msg = str(e)
+        if "content type" in msg or "not a Word file" in msg:
+            print(f"  ⚠  Corrupt/invalid file skipped: {Path(filepath).name}")
+            print(f"       The file is not a valid Word document ({msg.split('content type')[-1].strip() if 'content type' in msg else msg})")
+            print(f"       Ask the student to re-export from Microsoft Word and resubmit.")
+        else:
+            print(f"  ⚠  Could not open {Path(filepath).name}: {e}")
         return None
 
     data = {"source_file": Path(filepath).name}
