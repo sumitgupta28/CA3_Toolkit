@@ -2,6 +2,37 @@
 # CA3 Marks Processing — Setup & Usage Guide
 
 
+## Staging student files
+
+Students often submit `.docx` files that are saved in the wrong format (old binary `.doc` or `.dotx` template). Before running the main pipeline, use `stage_to_students.py` to detect, convert, and copy all files into the `students/` folder automatically.
+
+**1. Place all submitted files into `stage_students_files/`:**
+```
+stage_students_files/
+├── Student_10830923001.docx
+├── Student_10830923002.docx
+└── ...
+```
+
+**2. Run the staging script:**
+```bash
+python stage_to_students.py
+```
+
+This will:
+- Copy already-valid `.docx` files directly into `students/`
+- Convert `.dotx` template files to `.docx` (pure Python, no tools needed)
+- Convert old binary `.doc` files to `.docx` via **LibreOffice** (free — see below)
+- Leave originals in `stage_students_files/` untouched
+
+**LibreOffice** is required only when submitted files are in the old binary `.doc` format.
+Download: https://www.libreoffice.org/download/
+
+Once `stage_to_students.py` completes, proceed with the workflow below.
+
+---
+
+
 ## Initial setup
 
 Run the one-time setup script for your operating system. It will:
@@ -43,9 +74,12 @@ Set up your project folder like this before starting:
 ```
 your-project/
 │
-├── students/                   ← Put all student .docx files here
+├── stage_students_files/       ← Drop submitted files here (any format)
 │   ├── Student_1083062235.docx
-│   ├── Student_1083062236.docx
+│   └── ...
+│
+├── students/                   ← Auto-populated by stage_to_students.py
+│   ├── Student_1083062235.docx
 │   └── ...
 │
 ├── CA3_Marks/
@@ -55,7 +89,8 @@ your-project/
 │
 ├── examiner_signature.png      ← Your signature image (PNG recommended)
 │
-├── extract_to_excel.py         ← Run first
+├── stage_to_students.py        ← Run before extract_to_excel.py
+├── extract_to_excel.py         ← Run first (after staging)
 ├── fill_marks_and_export.py    ← Run after filling Excel
 │
 └── output/
@@ -94,7 +129,13 @@ They fill in the top section (Program Name, Subject, Name, Roll Number, etc.)
 and sign at the bottom. **Each student must have a unique 10-digit Roll Number.**
 
 ### Step 2 — Collect returned documents
-Place all returned `.docx` files into the `students/` folder.
+Place all returned files into the `stage_students_files/` folder (any format — `.docx`, old binary `.doc`, or `.dotx` template).
+
+### Step 2b — Stage files into students/ folder
+```bash
+python stage_to_students.py
+```
+Detects each file's true format, converts non-`.docx` files, and copies everything into `students/`. Originals in `stage_students_files/` are preserved.
 
 ### Step 3 — Generate the marks spreadsheet
 ```bash
@@ -149,11 +190,6 @@ To delete all generated files and student documents (keeps `CA3_Marks/marks.xlsx
 **Windows:**
 ```bat
 cleanup.bat
-```
-
-Or using Python (cross-platform, no prompt for marks.xlsx):
-```bash
-python cleanup.py
 ```
 
 ---

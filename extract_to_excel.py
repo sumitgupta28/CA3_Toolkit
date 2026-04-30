@@ -269,12 +269,18 @@ def main():
     print("-" * 56)
 
     rows = []
+    skipped_files = []
     for fp in docx_files:
         print(f"  Reading: {Path(fp).name} ...", end=" ")
         data = parse_student_doc(fp)
         if data:
+            roll = data.get("roll_number", "").strip()
+            if not roll:
+                reason = "Roll Number is blank"
+                print(f"⚠  Skipped — {reason}")
+                skipped_files.append((Path(fp).name, reason))
+                continue
             rows.append(data)
-            roll = data.get("roll_number") or "(no Roll)"
             name = data.get("student_name") or "(no name)"
             print(f"✓  Roll={roll}  Name={name}")
 
@@ -290,6 +296,10 @@ def main():
     print("-" * 56)
     print(f"\n✅  Excel written: {output_path}")
     print(f"   {len(rows)} student row(s) ready for marks entry.")
+    if skipped_files:
+        print(f"\n⚠  {len(skipped_files)} file(s) skipped:")
+        for name, reason in skipped_files:
+            print(f"   • {name} — {reason}")
     print("\n📝  Next steps:")
     print("   1. Open marks.xlsx")
     print("   2. Fill in the yellow 'Awarded' columns + feedback columns")

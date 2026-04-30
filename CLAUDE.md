@@ -30,7 +30,6 @@ python fill_marks_and_export.py
 # Cleanup: Delete generated output, students/ contents; optionally delete CA3_Marks/marks.xlsx
 ./cleanup.sh        # macOS/Linux
 cleanup.bat         # Windows
-python cleanup.py   # cross-platform (no prompt)
 
 # Dev only: Generate 10 test student documents into students/ folder
 python generate_test_documents.py
@@ -53,9 +52,9 @@ Three pipeline scripts plus cleanup utilities. No shared module — configuratio
 **`generate_test_documents.py`**
 - Creates sample student documents from a CA3 template for testing the extraction pipeline
 
-**`cleanup.sh` / `cleanup.bat` / `cleanup.py`**
+**`cleanup.sh` / `cleanup.bat`**
 - Deletes `output/`, `CA3_Marks_Pdf/`, `__pycache__/`, and contents of `students/`
-- `.sh` and `.bat` prompt the user before deleting `CA3_Marks/marks.xlsx`
+- Prompts the user before deleting `CA3_Marks/marks.xlsx`
 
 ## Key Configuration Constants
 

@@ -11,6 +11,7 @@ output/
 CA3_Marks_Pdf/
 
 # Student documents (contain personal data)
+stage_students_files/
 students/
 students_test_documents.zip
 
