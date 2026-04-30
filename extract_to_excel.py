@@ -268,9 +268,9 @@ def main():
         data = parse_student_doc(fp)
         if data:
             rows.append(data)
-            upid = data.get("upid") or "(no UPID)"
+            roll = data.get("roll_number") or "(no Roll)"
             name = data.get("student_name") or "(no name)"
-            print(f"✓  UPID={upid}  Name={name}")
+            print(f"✓  Roll={roll}  Name={name}")
 
     if not rows:
         print("\nNo data extracted. Exiting.")

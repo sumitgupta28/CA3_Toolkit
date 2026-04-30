@@ -65,7 +65,7 @@ QUESTION_LABELS = ["1a", "1b", "1c", "1d", "1e", "2", "3", "4", "5", "6", "7"]
 
 def load_marks_excel(excel_path):
     """
-    Returns a dict keyed by UPID (uppercase, stripped).
+    Returns a dict keyed by Roll Number (uppercase, stripped).
     Each value is a dict of all columns from that row.
     """
     wb = openpyxl.load_workbook(excel_path, data_only=True)
@@ -76,12 +76,11 @@ def load_marks_excel(excel_path):
 
     for row in ws.iter_rows(min_row=2, values_only=True):
         row_dict = {headers[i]: (str(v).strip() if v is not None else "") for i, v in enumerate(row)}
-        upid = row_dict.get("UPID", "").strip().upper()
-        if upid:
-            records[upid] = row_dict
-        elif row_dict.get("upid", "").strip():
-            upid = row_dict["upid"].strip().upper()
-            records[upid] = row_dict
+        roll = row_dict.get("Roll Number", "").strip().upper()
+        if not roll:
+            roll = row_dict.get("roll_number", "").strip().upper()
+        if roll:
+            records[roll] = row_dict
 
     return records
 
@@ -332,7 +331,7 @@ def main():
     print(f"    {len(marks_data)} student record(s) loaded.")
 
     if not marks_data:
-        print("ERROR: No data found in Excel. Make sure UPID column is filled.")
+        print("ERROR: No data found in Excel. Make sure Roll Number column is filled.")
         sys.exit(1)
 
     # ── find all student docx files ───────────────────────────────────────
@@ -353,35 +352,35 @@ def main():
         fname = Path(fp).name
         print(f"\n  File: {fname}")
 
-        # read UPID from document
+        # read Roll Number from document
         try:
             doc_tmp = Document(fp)
             tables  = doc_tmp.tables
-            raw_upid = ""
+            raw_roll = ""
             if tables:
-                # UPID is row 2, col 0 of the first table
-                raw_upid = tables[0].rows[2].cells[0].text.strip()
+                # Roll Number is row 3, col 1 of the first table
+                raw_roll = tables[0].rows[3].cells[1].text.strip()
                 # strip the label
-                if ":" in raw_upid:
-                    raw_upid = raw_upid.split(":", 1)[1].strip()
-            upid = raw_upid.upper()
+                if ":" in raw_roll:
+                    raw_roll = raw_roll.split(":", 1)[1].strip()
+            roll = raw_roll.upper()
         except Exception as e:
-            print(f"    ⚠  Could not read UPID: {e}  — skipping.")
+            print(f"    ⚠  Could not read Roll Number: {e}  — skipping.")
             skip_count += 1
             continue
 
-        if not upid:
-            print(f"    ⚠  UPID is blank — skipping.")
+        if not roll:
+            print(f"    ⚠  Roll Number is blank — skipping.")
             skip_count += 1
             continue
 
-        row_data = marks_data.get(upid)
+        row_data = marks_data.get(roll)
         if not row_data:
-            print(f"    ⚠  UPID '{upid}' not found in Excel — skipping.")
+            print(f"    ⚠  Roll Number '{roll}' not found in Excel — skipping.")
             skip_count += 1
             continue
 
-        print(f"    UPID={upid}  →  matched in Excel ✓")
+        print(f"    Roll={roll}  →  matched in Excel ✓")
 
         # ── update docx ──────────────────────────────────────────────────
         out_docx = OUTPUT_DOCX_FOLDER / fname

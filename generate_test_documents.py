@@ -24,10 +24,10 @@ USAGE
 OUTPUT
 ------
     students/
-    ├── student_UPID2025001.docx   (Aarav Sharma)
-    ├── student_UPID2025002.docx   (Priya Mehta)
+    ├── student_1083062235.docx   (Aarav Sharma)
+    ├── student_1083062236.docx   (Priya Mehta)
     ├── ...
-    └── student_UPID2025010.docx   (Megha Singh)
+    └── student_1083062244.docx   (Megha Singh)
 
 CONFIGURATION
 -------------
@@ -85,79 +85,79 @@ COMMON_DATA = {
 }
 
 # ── Individual student data ────────────────────────────────────────────────────
-# upid     : must be unique — this is the key used to match Excel rows later
+# upid     : written into the document template (informational only)
 # name     : full name of the student
-# roll     : roll number
+# roll     : roll number — this is the unique key used to match Excel rows later
 # mobile   : contact number
 # date_exam: date the student signed/submitted (can differ per student)
 STUDENTS = [
     {
         "upid"     : "UPID2025001",
         "name"     : "Aarav Sharma",
-        "roll"     : "BCA/2023/001",
+        "roll"     : "1083062235",
         "mobile"   : "9876543210",
         "date_exam": "15-04-2025",
     },
     {
         "upid"     : "UPID2025002",
         "name"     : "Priya Mehta",
-        "roll"     : "BCA/2023/002",
+        "roll"     : "1083062236",
         "mobile"   : "9876543211",
         "date_exam": "15-04-2025",
     },
     {
         "upid"     : "UPID2025003",
         "name"     : "Rohan Das",
-        "roll"     : "BCA/2023/003",
+        "roll"     : "1083062237",
         "mobile"   : "9876543212",
         "date_exam": "16-04-2025",
     },
     {
         "upid"     : "UPID2025004",
         "name"     : "Sneha Bose",
-        "roll"     : "BCA/2023/004",
+        "roll"     : "1083062238",
         "mobile"   : "9876543213",
         "date_exam": "16-04-2025",
     },
     {
         "upid"     : "UPID2025005",
         "name"     : "Vikram Yadav",
-        "roll"     : "BCA/2023/005",
+        "roll"     : "1083062239",
         "mobile"   : "9876543214",
         "date_exam": "15-04-2025",
     },
     {
         "upid"     : "UPID2025006",
         "name"     : "Ananya Roy",
-        "roll"     : "BCA/2023/006",
+        "roll"     : "1083062240",
         "mobile"   : "9876543215",
         "date_exam": "15-04-2025",
     },
     {
         "upid"     : "UPID2025007",
         "name"     : "Karan Gupta",
-        "roll"     : "BCA/2023/007",
+        "roll"     : "1083062241",
         "mobile"   : "9876543216",
         "date_exam": "17-04-2025",
     },
     {
         "upid"     : "UPID2025008",
         "name"     : "Deepika Nair",
-        "roll"     : "BCA/2023/008",
+        "roll"     : "1083062242",
         "mobile"   : "9876543217",
         "date_exam": "17-04-2025",
     },
     {
         "upid"     : "UPID2025009",
         "name"     : "Arjun Patel",
-        "roll"     : "BCA/2023/009",
+        "roll"     : "1083062243",
         "mobile"   : "9876543218",
         "date_exam": "15-04-2025",
     },
     {
         "upid"     : "UPID2025010",
         "name"     : "Megha Singh",
-        "roll"     : "BCA/2023/010",
+        "roll"     : "1083062244",
         "mobile"   : "9876543219",
         "date_exam": "16-04-2025",
     },
@@ -340,12 +340,12 @@ def main():
     out_dir = Path(OUTPUT_FOLDER)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # ── check for duplicate UPIDs ─────────────────────────────────────────
-    upids = [s["upid"] for s in STUDENTS]
-    if len(upids) != len(set(upids)):
-        duplicates = [u for u in upids if upids.count(u) > 1]
-        print(f"ERROR: Duplicate UPIDs found: {set(duplicates)}")
-        print("       Each student must have a unique UPID.")
+    # ── check for duplicate Roll Numbers ─────────────────────────────────
+    rolls = [s["roll"] for s in STUDENTS]
+    if len(rolls) != len(set(rolls)):
+        duplicates = [r for r in rolls if rolls.count(r) > 1]
+        print(f"ERROR: Duplicate Roll Numbers found: {set(duplicates)}")
+        print("       Each student must have a unique Roll Number.")
         sys.exit(1)
 
     # ── generate documents ────────────────────────────────────────────────
@@ -358,7 +358,7 @@ def main():
     errors    = []
 
     for student in STUDENTS:
-        fname = f"student_{student['upid']}.docx"
+        fname = f"student_{student['roll']}.docx"
         fpath = out_dir / fname
         try:
             doc = build_student_document(template, student, COMMON_DATA)

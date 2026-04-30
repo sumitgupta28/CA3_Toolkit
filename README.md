@@ -1,23 +1,6 @@
+
 # CA3 Marks Processing — Setup & Usage Guide
 
-## Generating test documents (optional)
-
-Before running the full workflow, you can generate 10 sample student `.docx` files to test the pipeline end-to-end:
-
-```bash
-python generate_test_documents.py
-```
-
-This creates pre-filled student documents in the `students/` folder using a CA3 template (`Seal_Top_Sheet_template.docx`). Each document simulates a student who has completed the top information section and signed the bottom.
-
-Edit the constants at the top of `generate_test_documents.py` to customise:
-- `TEMPLATE_PATH` — path to your blank CA3 template
-- `COMMON_DATA` — shared fields (college, subject, teacher, etc.)
-- `STUDENTS` — individual student details (UPID, name, roll number, etc.)
-
-A `.zip` archive of all generated files (`students_test_documents.zip`) is also created by default.
-
----
 
 ## Initial setup
 
@@ -61,8 +44,8 @@ Set up your project folder like this before starting:
 your-project/
 │
 ├── students/                   ← Put all student .docx files here
-│   ├── student_U001.docx
-│   ├── student_U002.docx
+│   ├── student_1083062235.docx
+│   ├── student_1083062236.docx
 │   └── ...
 │
 ├── CA3_Marks/
@@ -81,12 +64,34 @@ your-project/
 
 ---
 
+
+## Generating test documents (optional)
+
+Before running the full workflow, you can generate 10 sample student `.docx` files to test the pipeline end-to-end:
+
+```bash
+python generate_test_documents.py
+```
+
+This creates pre-filled student documents in the `students/` folder using a CA3 template (`Seal_Top_Sheet_template.docx`). Each document simulates a student who has completed the top information section and signed the bottom.
+
+Edit the constants at the top of `generate_test_documents.py` to customise:
+- `TEMPLATE_PATH` — path to your blank CA3 template
+- `COMMON_DATA` — shared fields (college, subject, teacher, etc.)
+- `STUDENTS` — individual student details (name, 10-digit roll number, etc.)
+
+A `.zip` archive of all generated files (`students_test_documents.zip`) is also created by default.
+
+---
+
+
+
 ## Step-by-step workflow
 
 ### Step 1 — Share template with students
 Send the original `.docx` template to students.
-They fill in the top section (Program Name, Subject, UPID, Name, Roll No, etc.)
-and sign at the bottom. **Each student must have a unique UPID.**
+They fill in the top section (Program Name, Subject, Name, Roll Number, etc.)
+and sign at the bottom. **Each student must have a unique 10-digit Roll Number.**
 
 ### Step 2 — Collect returned documents
 Place all returned `.docx` files into the `students/` folder.
@@ -123,7 +128,7 @@ Place your signature image as `examiner_signature.png` in the project folder, th
 python fill_marks_and_export.py
 ```
 This will:
-- Match each `.docx` to its Excel row via UPID
+- Match each `.docx` to its Excel row via Roll Number (10-digit)
 - Fill in Marks Awarded for each question
 - Fill in Examiner Feedback
 - Insert your signature image + today's date
@@ -155,8 +160,8 @@ python cleanup.py
 
 ## Tips
 
-- **UPID must match exactly** between the student's document and the Excel.
-  If a student leaves UPID blank or misspells it, that file will be skipped.
+- **Roll Number must match exactly** between the student's document and the Excel.
+  If a student leaves Roll Number blank or enters it incorrectly, that file will be skipped.
 - **Original files are never modified.** All output goes to `output/docx/` and `CA3_Marks_Pdf/`.
 - If neither LibreOffice nor `docx2pdf` is available, `.docx` files are still updated — only PDF export is skipped.
 
@@ -167,7 +172,7 @@ python cleanup.py
 | Problem | Fix |
 |---------|-----|
 | `ModuleNotFoundError: docx` | Run `pip install python-docx openpyxl docx2pdf` |
-| UPID not found in Excel | Check spelling in both the .docx and the Excel UPID column |
+| Roll Number not found in Excel | Check that the 10-digit Roll Number in the `.docx` matches the Roll Number column in Excel |
 | PDF not generated | Ensure `docx2pdf` is installed (`pip install docx2pdf`) and Microsoft Word is available |
 | Signature not appearing | Ensure `examiner_signature.png` is in the same folder as the scripts |
 | `CA3_Marks/marks.xlsx` not found | Run `extract_to_excel.py` first to generate it |

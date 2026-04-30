@@ -212,9 +212,9 @@ def main():
             cell.fill      = _YELLOW
             cell.alignment = Alignment(vertical="center", wrap_text=True)
 
-        upid = ws.cell(row=row_num, column=col.get("UPID", 1)).value or ""
+        roll = ws.cell(row=row_num, column=col.get("Roll Number", 1)).value or ""
         name = ws.cell(row=row_num, column=col.get("Student Name", 2)).value or ""
-        print(f"  ✓  {str(upid):<16}  {name}")
+        print(f"  ✓  {str(roll):<16}  {name}")
 
     wb.save(excel_path)
     print("-" * 60)
