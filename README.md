@@ -121,6 +121,94 @@ A `.zip` archive of all generated files (`students_test_documents.zip`) is also 
 
 
 
+## Workflow Overview
+
+```mermaid
+flowchart TD
+    START([Start]) --> SETUP
+
+    SETUP["**Initial Setup**
+    setup.sh / setup.bat
+    _(installs dependencies)_"]
+
+    SETUP --> CHOICE{Real submissions
+    or testing?}
+
+    CHOICE -->|Real submissions| PLACE["**Place submitted files**
+    into stage_students_files/
+    (.docx / .doc / .dotx)"]
+
+    CHOICE -->|Testing / Dev| GEN["**[OPTIONAL]**
+    python generate_test_documents.py
+    Creates 10 sample student .docx files
+    directly in students/"]
+
+    PLACE --> STAGE["**python stage_to_students.py**
+    Converts .doc / .dotx → .docx
+    Copies all files into students/"]
+
+    STAGE --> STUDENTS[(students/
+    folder ready)]
+    GEN --> STUDENTS
+
+    STUDENTS --> EXTRACT["**python extract_to_excel.py**
+    Reads every .docx in students/
+    Creates CA3_Marks/marks.xlsx
+    with yellow editable cells"]
+
+    EXTRACT --> EXCEL[(CA3_Marks/marks.xlsx
+    generated)]
+
+    EXCEL --> FILLCHOICE{Fill marks
+    manually or auto?}
+
+    FILLCHOICE -->|Manual| MANUAL["**Open marks.xlsx**
+    Fill yellow cells:
+    Awarded marks + Feedback
+    per question"]
+
+    FILLCHOICE -->|Auto / Testing| DUMMY["**[OPTIONAL]**
+    python fill_dummy_marks.py
+    Auto-fills yellow cells with
+    random marks & sample feedback"]
+
+    MANUAL --> FILLED[(marks.xlsx
+    fully filled)]
+    DUMMY --> FILLED
+
+    FILLED --> SIG["**Place examiner_signature.png**
+    in project root folder"]
+
+    SIG --> EXPORT["**python fill_marks_and_export.py**
+    Matches Excel rows → .docx via Roll Number
+    Fills marks, feedback & signature
+    Saves updated .docx to output/docx/
+    Converts to PDF in CA3_Marks_Pdf/"]
+
+    EXPORT --> DONE([Done — PDFs ready
+    in CA3_Marks_Pdf/])
+
+    DONE --> CLEANUP["**[OPTIONAL]**
+    cleanup.sh / cleanup.bat
+    Deletes output/, CA3_Marks_Pdf/,
+    students/ contents
+    _(prompts before deleting marks.xlsx)_"]
+
+    CLEANUP --> END([End])
+    DONE --> END
+
+    style GEN fill:#fff9c4,stroke:#f9a825
+    style DUMMY fill:#fff9c4,stroke:#f9a825
+    style CLEANUP fill:#fff9c4,stroke:#f9a825
+    style START fill:#c8e6c9,stroke:#388e3c
+    style DONE fill:#c8e6c9,stroke:#388e3c
+    style END fill:#c8e6c9,stroke:#388e3c
+```
+
+> **Legend:** Yellow boxes = optional steps. Green = start/end.
+
+---
+
 ## Step-by-step workflow
 
 ### Step 1 — Share template with students
