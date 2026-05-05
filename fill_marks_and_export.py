@@ -178,9 +178,9 @@ def update_document(src_path, dest_path, row_data, signature_path):
     # ── Examiner feedback paragraphs ─────────────────────────────────────
     # We look for the paragraph IMMEDIATELY after the label paragraphs
     feedback_map = {
-        "Strengths of the Student:": ("Strengths",              "strengths"),
-        "Areas for Improvement:":    ("Areas for Improvement",  "areas_for_improvement"),
-        "Suggested Corrective Measures:": ("Corrective Measures", "corrective_measures"),
+        "Strengths of the Student:": ("Strengths",              "Strengths"),
+        "Areas for Improvement:":    ("Areas for Improvement",  "Areas for Improvement"),
+        "Suggested Corrective Measures:": ("Corrective Measures", "Corrective Measures"),
     }
     # Build lookup: stripped full text → paragraph index
     para_texts = [para_full_text(p).strip() for p in doc.paragraphs]
