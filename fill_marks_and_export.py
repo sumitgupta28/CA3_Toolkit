@@ -128,12 +128,16 @@ def get_or_create_run_in_cell(cell):
 def set_cell_value(cell, value):
     """Set the text value of a table cell cleanly."""
     para = cell.paragraphs[0]
+    saved_alignment = para.alignment
     # remove all runs
     for run in para.runs:
         run._r.getparent().remove(run._r)
     if value:
         run = para.add_run(str(value))
         run.font.size = Pt(10)
+    # Restore explicit alignment; if none was set (inherited), force center so
+    # PDF renderers (LibreOffice) don't fall back to left-align.
+    para.alignment = saved_alignment if saved_alignment is not None else WD_ALIGN_PARAGRAPH.CENTER
 
 
 # ─────────────────────────────────────────────────────────────────────────────
